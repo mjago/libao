@@ -1,0 +1,10 @@
+name: libao
+version: 0.1.0
+
+authors:
+  - mjago <martyn.jago@btinternet.com>
+
+
+crystal: 0.20.1
+
+license: MIT
