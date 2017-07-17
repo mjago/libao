@@ -9,7 +9,7 @@ lib LibAO
   alias CFloat = LibC::Float
   alias CDouble = LibC::Double
   alias CChar = LibC::Char
-  alias Matrix = CChar*
+  alias Matrix = Pointer(CChar)
   alias Device = Void*
 
   enum Byte_Format
@@ -27,16 +27,17 @@ lib LibAO
   end
 
   struct Options
-    key   : CChar*
+    key : CChar*
     value : CChar*
-    next  : Options*
+    next : Options*
   end
 
-  fun init = ao_initialize() : Void
-  fun exit = ao_shutdown() : Void
-  fun default_driver_id = ao_default_driver_id() : CInt
+  fun init = ao_initialize : Void
+  fun default_driver_id = ao_default_driver_id : CInt
   fun open_live = ao_open_live(driver_id : CInt, sample_format : Format*, options : Options*) : Device*
   fun play = ao_play(device : Device*, output_samples : CChar*, num_bytes : CInt) : CInt
+  fun close = ao_close(device : Device*) : CInt
+  fun shutdown = ao_shutdown : Void
 end
 
 module Libao
@@ -57,15 +58,24 @@ module Libao
     end
 
     def open_live
-      @dev = LibAO.open_live(@id, pointerof(@format), nil);
+      @dev = LibAO.open_live(@id, pointerof(@format), nil)
     end
 
     def play(buf, done)
-      LibAO.play(@dev, buf, done);
+      LibAO.play(@dev, buf, done)
+    end
+
+    def close
+      LibAO.close(@dev)
+    end
+
+    def shutdown
+      LibAO.shutdown
     end
 
     def exit
-      LibAO.exit
+      close
+      shutdown
     end
   end
 end
